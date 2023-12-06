@@ -64,7 +64,7 @@ def makeRadarChart(df, maxPercentages, value):
         group=group,
         actualVal=actualVal))
     fig = px.line_polar(radarDf, r='radi', theta='angle', line_close=True, color='group', range_r=[0, 1],
-                        hover_name="actualVal", template="plotly_white", hover_data={'radi':False, 'angle': False, 'group': False})
+                        hover_name="actualVal", template="plotly_dark", hover_data={'radi':False, 'angle': False, 'group': False})
     fig.update_traces(fill='toself', mode="markers+lines")
     fig.layout.polar.radialaxis.tickvals = []
     return fig
@@ -118,8 +118,8 @@ def makeQuadrantPlot(df, yaxis):
     else:
         df[yaxis] = df['goalsScored'] - df['goalsConceded']
     fig = px.scatter(df, x="pointsPerGame", y=yaxis, template="simple_white", hover_name=df.index)
-    fig.add_vline(x=1.5, line_width=1, opacity=0.5, line_color="black")
-    fig.add_hline(y=0 if yaxis == "goalDifference" else 1, line_width=1, opacity=0.5, line_color="black")
+    fig.add_vline(x=1.5, line_width=1, opacity=0.5, line_color="white")
+    fig.add_hline(y=0 if yaxis == "goalDifference" else 1, line_width=1, opacity=0.5, line_color="white")
     fig.update_traces(textposition='top center')
     return fig
 
