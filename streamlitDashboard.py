@@ -72,7 +72,11 @@ def makeRadarChart(df, maxPercentages, value):
 def makeLinePlot(df, value):
     if value is None or len(value) == 0:
         return px.line()
-    fig = px.line(labels={"x": "Seasons", "y": "League Table Finish", }, template="simple_white")
+    temp = pd.DataFrame(dict(
+        x=[],
+        y=[]
+    ))
+    fig = px.line(temp, x='x', y='y', labels={"x": "Seasons", "y": "League Table Finish", }, template="simple_white")
     for val in value:
         seasons = df.loc[val].to_dict()["leagueFinish"]
         x = []
