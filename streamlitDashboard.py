@@ -1,3 +1,7 @@
+"""
+Author: Aman Dwivedi & Aditya Kumar
+This creates a dashboard on streamlit with four visualizations
+"""
 import streamlit as st
 import plotly.express as px
 import pandas as pd
@@ -5,23 +9,25 @@ import json
 
 
 def loadDataFrame():
+    """
+    Loads the dataframe from the json
+    """
     df = pd.DataFrame.from_dict(json.load(open("managerStats.json")), orient='index')
-    #df['pointsPerGame'] = df['pointsEarned'] / df['gamesPlayed']
-    #df['goalDifference'] = df['goalsScored'] - df['goalsConceded']
 
     maxPercentages = {"pointsEarned": max(df.to_dict()["pointsEarned"].values()),
                       "gamesPlayed": max(df.to_dict()["gamesPlayed"].values()),
                       "goalsScored": max(df.to_dict()["goalsScored"].values()),
                       "goalsConceded": max(df.to_dict()["goalsConceded"].values()),
                       "comebacks": max(df.to_dict()["comebacks"].values())}
-                      #"pointsPerGame": max(df.to_dict()["pointsPerGame"].values()),
-                      #"goalDifference": max(df.to_dict()["goalDifference"].values())}
     labels = {"pointsEarned": "Points Earned", "gamesPlayed": "Games Played",
               "goalsScored": "Goals Scored", "goalsConceded": "Goals Conceded",
               "comebacks": "Comebacks"}
     return df, maxPercentages, labels
 
 def makeParallelCoordinate(df, labels, value):
+    """
+    Makes the parallel coordinate plot
+    """
     fig = px.parallel_coordinates(df, color="pointsEarned",
                                   dimensions=["pointsEarned", "gamesPlayed", "goalsScored", "goalsConceded",
                                               "comebacks"], labels=labels,
@@ -37,6 +43,9 @@ def makeParallelCoordinate(df, labels, value):
 
 
 def makeRadarChart(df, maxPercentages, value):
+    """
+    Makes the radar chart
+    """
     if value is None or len(value) == 0:
         return px.line_polar(template="plotly_dark")
     radi = []
@@ -70,6 +79,9 @@ def makeRadarChart(df, maxPercentages, value):
     return fig
 
 def makeLinePlot(df, value):
+    """
+    Makes the line plot
+    """
     if value is None or len(value) == 0:
         return px.line()
     temp = pd.DataFrame(dict(
@@ -113,7 +125,10 @@ def makeLinePlot(df, value):
     fig.update_traces(mode='lines+markers')
     return fig
 
-def makeQuadrantPlot(df, yaxis):
+def makeQuadrantPlot(df, yaxis, value):
+    """
+    Make the quadrant plot
+    """
     df['pointsPerGame'] = df['pointsEarned'] / df['gamesPlayed']
     if yaxis == "goalsScoredPerGame":
         df[yaxis] = df['goalsScored'] / df['gamesPlayed']
@@ -122,12 +137,17 @@ def makeQuadrantPlot(df, yaxis):
     else:
         df[yaxis] = df['goalsScored'] - df['goalsConceded']
     fig = px.scatter(df, x="pointsPerGame", y=yaxis, template="simple_white", hover_name=df.index)
+    for val in value:
+        fig.add_scatter(y=[df.loc[val].to_dict()[yaxis]], x=[df.loc[val].to_dict()["pointsPerGame"]], mode="markers", name=val)
     fig.add_vline(x=1.5, line_width=1, opacity=0.5, line_color="white")
     fig.add_hline(y=0 if yaxis == "goalDifference" else 1, line_width=1, opacity=0.5, line_color="white")
     fig.update_traces(textposition='top center')
     return fig
 
 def streamLitApp(df, maxPercentages, labels):
+    """
+    Makes the streamlit dashboard
+    """
     st.set_page_config(layout="wide")
     st.image("title.png")
     st.title("Analysis of Managers")
@@ -152,7 +172,7 @@ def streamLitApp(df, maxPercentages, labels):
         yaxis = st.selectbox(
             'Select y axis',
             ["goalsScoredPerGame", "goalsConcededPerGame", "goalDifference"])
-        quadrantPlotFig = makeQuadrantPlot(df, yaxis)
+        quadrantPlotFig = makeQuadrantPlot(df, yaxis, value)
         st.plotly_chart(quadrantPlotFig, use_container_width=True)
 
 def main():
