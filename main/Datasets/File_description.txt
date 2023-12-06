@@ -1,0 +1,7 @@
+This is ESL dataset of past 20 years.
+
+* Year wise dataset.
+* It contain EPL_standing csv file which is past year position of each team in epl.
+* each csv file have different column.
+* Each column has been describe in Dataset explanation sheet.
+* Final dataset is final csv file generated after pre-processing all year dataset.
